@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 public class StudentManagementUI extends JFrame {
     private StudentManager studentManager = new StudentManager();
@@ -24,7 +25,7 @@ public class StudentManagementUI extends JFrame {
         JScrollPane scrollPane = new JScrollPane(textArea);
 
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(6, 1));
+        buttonPanel.setLayout(new GridLayout(7, 1));
 
         JButton addButton = new JButton("Create a new student");
         addButton.addActionListener(new ActionListener() {
@@ -66,6 +67,14 @@ public class StudentManagementUI extends JFrame {
         });
         buttonPanel.add(removeButton);
 
+        JButton searchButton = new JButton("Search students by name");
+        searchButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                searchStudentsByName();
+            }
+        });
+        buttonPanel.add(searchButton);
+
         JButton exitButton = new JButton("Exit");
         exitButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -81,14 +90,36 @@ public class StudentManagementUI extends JFrame {
     }
 
     private void createStudent() {
-        String firstName = JOptionPane.showInputDialog("Enter first name:");
-        String lastName = JOptionPane.showInputDialog("Enter last name:");
-        int age = Integer.parseInt(JOptionPane.showInputDialog("Enter age:"));
-        String major = JOptionPane.showInputDialog("Enter major:");
+        while (true) {
+            try {
+                String firstName = JOptionPane.showInputDialog("Enter first name:");
+                if (!firstName.matches("[a-zA-Z]+")) {
+                    throw new IllegalArgumentException("First name must contain only letters.");
+                }
 
-        Student student = new Student(firstName, lastName, age, major);
-        studentManager.addStudent(student);
-        textArea.append("Student added successfully.\n");
+                String lastName = JOptionPane.showInputDialog("Enter last name:");
+                if (!lastName.matches("[a-zA-Z]+")) {
+                    throw new IllegalArgumentException("Last name must contain only letters.");
+                }
+
+                String ageInput = JOptionPane.showInputDialog("Enter age:");
+                int age = Integer.parseInt(ageInput);
+                if (age <= 0) {
+                    throw new IllegalArgumentException("Age must be a positive integer.");
+                }
+
+                String major = JOptionPane.showInputDialog("Enter major:");
+
+                Student student = new Student(firstName, lastName, age, major);
+                String message = studentManager.addStudent(student);
+                textArea.append(message + "\n");
+                break;
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Age must be an integer.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            } catch (IllegalArgumentException e) {
+                JOptionPane.showMessageDialog(this, e.getMessage(), "Input Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
 
     private void viewAllStudents() {
@@ -101,41 +132,80 @@ public class StudentManagementUI extends JFrame {
     }
 
     private void viewStudentById() {
-        int id = Integer.parseInt(JOptionPane.showInputDialog("Enter student ID:"));
-        studentManager.getStudentById(id).ifPresentOrElse(
-            student -> textArea.setText(student.toString()),
-            () -> textArea.setText("Student not found.\n")
-        );
+        try {
+            int id = Integer.parseInt(JOptionPane.showInputDialog("Enter student ID:"));
+            studentManager.getStudentById(id).ifPresentOrElse(
+                student -> textArea.setText(student.toString()),
+                () -> textArea.setText("Student not found.\n")
+            );
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "ID must be an integer.", "Input Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private void updateStudent() {
-        int id = Integer.parseInt(JOptionPane.showInputDialog("Enter student ID:"));
-        String firstName = JOptionPane.showInputDialog("Enter new first name:");
-        String lastName = JOptionPane.showInputDialog("Enter new last name:");
-        int age = Integer.parseInt(JOptionPane.showInputDialog("Enter new age:"));
-        String major = JOptionPane.showInputDialog("Enter new major:");
+        while (true) {
+            try {
+                int id = Integer.parseInt(JOptionPane.showInputDialog("Enter student ID:"));
+                String firstName = JOptionPane.showInputDialog("Enter new first name:");
+                if (!firstName.matches("[a-zA-Z]+")) {
+                    throw new IllegalArgumentException("First name must contain only letters.");
+                }
 
-        if (studentManager.updateStudent(id, firstName, lastName, age, major)) {
-            textArea.append("Student updated successfully.\n");
-        } else {
-            textArea.append("Student not found.\n");
+                String lastName = JOptionPane.showInputDialog("Enter new last name:");
+                if (!lastName.matches("[a-zA-Z]+")) {
+                    throw new IllegalArgumentException("Last name must contain only letters.");
+                }
+
+                String ageInput = JOptionPane.showInputDialog("Enter new age:");
+                int age = Integer.parseInt(ageInput);
+                if (age <= 0) {
+                    throw new IllegalArgumentException("Age must be a positive integer.");
+                }
+
+                String major = JOptionPane.showInputDialog("Enter new major:");
+
+                String message = studentManager.updateStudent(id, firstName, lastName, age, major);
+                textArea.append(message + "\n");
+                break;
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Age must be an integer.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            } catch (IllegalArgumentException e) {
+                JOptionPane.showMessageDialog(this, e.getMessage(), "Input Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 
     private void deleteStudent() {
-        int id = Integer.parseInt(JOptionPane.showInputDialog("Enter student ID:"));
-        if (studentManager.deleteStudent(id)) {
-            textArea.append("Student deleted successfully.\n");
-        } else {
-            textArea.append("Student not found.\n");
+        try {
+            int id = Integer.parseInt(JOptionPane.showInputDialog("Enter student ID:"));
+            if (studentManager.deleteStudent(id)) {
+                textArea.append("Student deleted successfully.\n");
+            } else {
+                textArea.append("Student not found.\n");
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "ID must be an integer.", "Input Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    public static void runUI() {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                new StudentManagementUI().setVisible(true);
+    private void searchStudentsByName() {
+        String name = JOptionPane.showInputDialog("Enter name to search:");
+        List<Student> results = studentManager.searchStudentsByName(name);
+        textArea.setText("");
+        if (results.isEmpty()) {
+            textArea.append("No students found.\n");
+        } else {
+            for (Student student : results) {
+                textArea.append(student.toString() + "\n");
             }
+        }
+    }
+
+    public static void main(String[] args) {
+        EventQueue.invokeLater(() -> {
+            StudentManagementUI ui = new StudentManagementUI();
+            ui.setVisible(true);
         });
     }
 }

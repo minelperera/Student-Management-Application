@@ -5,8 +5,9 @@ import java.util.Optional;
 public class StudentManager {
     private List<Student> students = new ArrayList<>();
 
-    public void addStudent(Student student) {
+    public String addStudent(Student student) {
         students.add(student);
+        return "Student added successfully.";
     }
 
     public List<Student> getAllStudents() {
@@ -17,25 +18,36 @@ public class StudentManager {
         return students.stream().filter(s -> s.getId() == id && !s.isDeleted()).findFirst();
     }
 
-    public boolean updateStudent(int id, String firstName, String lastName, int age, String major) {
-        Optional<Student> studentOptional = getStudentById(id);
-        if (studentOptional.isPresent()) {
-            Student student = studentOptional.get();
+    public String updateStudent(int id, String firstName, String lastName, int age, String major) {
+        Optional<Student> studentOpt = getStudentById(id);
+        if (studentOpt.isPresent()) {
+            Student student = studentOpt.get();
             student.setFirstName(firstName);
             student.setLastName(lastName);
             student.setAge(age);
             student.setMajor(major);
+            return "Student updated successfully.";
+        } else {
+            return "Student not found.";
+        }
+    }
+
+    public boolean deleteStudent(int id) {
+        Optional<Student> studentOpt = getStudentById(id);
+        if (studentOpt.isPresent()) {
+            studentOpt.get().setDeleted(true);
             return true;
         }
         return false;
     }
 
-    public boolean deleteStudent(int id) {
-        Optional<Student> studentOptional = getStudentById(id);
-        if (studentOptional.isPresent()) {
-            studentOptional.get().setDeleted(true);
-            return true;
+    public List<Student> searchStudentsByName(String name) {
+        List<Student> results = new ArrayList<>();
+        for (Student student : students) {
+            if (!student.isDeleted() && (student.getFirstName().equalsIgnoreCase(name) || student.getLastName().equalsIgnoreCase(name))) {
+                results.add(student);
+            }
         }
-        return false;
+        return results;
     }
 }

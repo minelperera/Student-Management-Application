@@ -5,7 +5,7 @@ public class Student {
     private String lastName;
     private int age;
     private String major;
-    private boolean isDeleted;
+    private boolean deleted;
 
     public Student(String firstName, String lastName, int age, String major) {
         this.id = idCounter++;
@@ -13,8 +13,10 @@ public class Student {
         this.lastName = lastName;
         this.age = age;
         this.major = major;
-        this.isDeleted = false;
+        this.deleted = false;
     }
+
+    // Getters and Setters
 
     public int getId() {
         return id;
@@ -53,19 +55,19 @@ public class Student {
     }
 
     public boolean isDeleted() {
-        return isDeleted;
+        return deleted;
     }
 
     public void setDeleted(boolean deleted) {
-        isDeleted = deleted;
+        this.deleted = deleted;
     }
 
     @Override
     public String toString() {
         return "ID: " + id + "\n" +
-               "First Name: " + firstName + "\n" +
-               "Last Name: " + lastName + "\n" +
-               "Age: " + age + "\n" +
-               "Major: " + major + "\n";
+                "First Name: " + firstName + "\n" +
+                "Last Name: " + lastName + "\n" +
+                "Age: " + age + "\n" +
+                "Major: " + major + "\n";
     }
 }

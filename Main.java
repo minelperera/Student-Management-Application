@@ -1,3 +1,4 @@
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -5,62 +6,102 @@ public class Main {
     private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
-        System.out.println("Choose mode:");
-        System.out.println("1. Console");
-        System.out.println("2. GUI");
-        System.out.print("Enter your choice: ");
-        int choice = Integer.parseInt(scanner.nextLine());
-        if (choice == 1) {
-            runConsole();
-        } else if (choice == 2) {
-            StudentManagementUI.runUI();
-        } else {
-            System.out.println("Invalid choice. Exiting.");
-        }
-    }
-
-    private static void runConsole() {
         while (true) {
-            showMenu();
-            int choice = Integer.parseInt(scanner.nextLine());
+            System.out.println("1. Console");
+            System.out.println("2. GUI");
+            System.out.print("Enter your choice: ");
+            String choice = scanner.nextLine();
             switch (choice) {
-                case 1 -> createStudent();
-                case 2 -> viewAllStudents();
-                case 3 -> viewStudentById();
-                case 4 -> updateStudent();
-                case 5 -> deleteStudent();
-                case 6 -> {
-                    System.out.println("Exiting...");
-                    System.exit(0);
-                }
-                default -> System.out.println("Invalid choice. Please try again.");
+                case "1":
+                    runConsoleInterface();
+                    break;
+                case "2":
+                    runGuiInterface();
+                    break;
+                default:
+                    System.out.println("Invalid input. Please enter 1 for Console or 2 for GUI.");
             }
         }
     }
 
-    private static void showMenu() {
-        System.out.println("1. Create a new student");
-        System.out.println("2. View all students");
-        System.out.println("3. View a specific student’s information");
-        System.out.println("4. Modify the details of an existing student");
-        System.out.println("5. Remove a student from the system");
-        System.out.println("6. Exit");
-        System.out.print("Enter your choice: ");
+    private static void runConsoleInterface() {
+        while (true) {
+            System.out.println("1. Create a new student");
+            System.out.println("2. View all students");
+            System.out.println("3. View a specific student’s information");
+            System.out.println("4. Modify the details of an existing student");
+            System.out.println("5. Remove a student from the system");
+            System.out.println("6. Search students by name");
+            System.out.println("7. Exit");
+            System.out.print("Enter your choice: ");
+
+            String choice = scanner.nextLine();
+            switch (choice) {
+                case "1":
+                    createStudent();
+                    break;
+                case "2":
+                    viewAllStudents();
+                    break;
+                case "3":
+                    viewStudentById();
+                    break;
+                case "4":
+                    updateStudent();
+                    break;
+                case "5":
+                    deleteStudent();
+                    break;
+                case "6":
+                    searchStudentsByName();
+                    break;
+                case "7":
+                    return;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+
+    private static void runGuiInterface() {
+        StudentManagementUI ui = new StudentManagementUI();
+        ui.setVisible(true);
     }
 
     private static void createStudent() {
-        System.out.print("Enter first name: ");
-        String firstName = scanner.nextLine();
-        System.out.print("Enter last name: ");
-        String lastName = scanner.nextLine();
-        System.out.print("Enter age: ");
-        int age = Integer.parseInt(scanner.nextLine());
-        System.out.print("Enter major: ");
-        String major = scanner.nextLine();
+        while (true) {
+            try {
+                System.out.print("Enter first name: ");
+                String firstName = scanner.nextLine();
+                if (!firstName.matches("[a-zA-Z]+")) {
+                    throw new IllegalArgumentException("First name must contain only letters.");
+                }
 
-        Student student = new Student(firstName, lastName, age, major);
-        studentManager.addStudent(student);
-        System.out.println("Student added successfully.");
+                System.out.print("Enter last name: ");
+                String lastName = scanner.nextLine();
+                if (!lastName.matches("[a-zA-Z]+")) {
+                    throw new IllegalArgumentException("Last name must contain only letters.");
+                }
+
+                System.out.print("Enter age: ");
+                int age = Integer.parseInt(scanner.nextLine());
+                if (age <= 0) {
+                    throw new IllegalArgumentException("Age must be a positive integer.");
+                }
+
+                System.out.print("Enter major: ");
+                String major = scanner.nextLine();
+
+                Student student = new Student(firstName, lastName, age, major);
+                String message = studentManager.addStudent(student);
+                System.out.println(message);
+                break;
+            } catch (NumberFormatException e) {
+                System.out.println("Age must be an integer.");
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        }
     }
 
     private static void viewAllStudents() {
@@ -72,40 +113,80 @@ public class Main {
     }
 
     private static void viewStudentById() {
-        System.out.print("Enter student ID: ");
-        int id = Integer.parseInt(scanner.nextLine());
-        studentManager.getStudentById(id).ifPresentOrElse(
-            student -> System.out.println(student),
-            () -> System.out.println("Student not found.")
-        );
+        try {
+            System.out.print("Enter student ID: ");
+            int id = Integer.parseInt(scanner.nextLine());
+            studentManager.getStudentById(id).ifPresentOrElse(
+                student -> System.out.println(student),
+                () -> System.out.println("Student not found.")
+            );
+        } catch (NumberFormatException e) {
+            System.out.println("ID must be an integer.");
+        }
     }
 
     private static void updateStudent() {
-        System.out.print("Enter student ID: ");
-        int id = Integer.parseInt(scanner.nextLine());
-        System.out.print("Enter new first name: ");
-        String firstName = scanner.nextLine();
-        System.out.print("Enter new last name: ");
-        String lastName = scanner.nextLine();
-        System.out.print("Enter new age: ");
-        int age = Integer.parseInt(scanner.nextLine());
-        System.out.print("Enter new major: ");
-        String major = scanner.nextLine();
+        while (true) {
+            try {
+                System.out.print("Enter student ID: ");
+                int id = Integer.parseInt(scanner.nextLine());
 
-        if (studentManager.updateStudent(id, firstName, lastName, age, major)) {
-            System.out.println("Student updated successfully.");
-        } else {
-            System.out.println("Student not found.");
+                System.out.print("Enter new first name: ");
+                String firstName = scanner.nextLine();
+                if (!firstName.matches("[a-zA-Z]+")) {
+                    throw new IllegalArgumentException("First name must contain only letters.");
+                }
+
+                System.out.print("Enter new last name: ");
+                String lastName = scanner.nextLine();
+                if (!lastName.matches("[a-zA-Z]+")) {
+                    throw new IllegalArgumentException("Last name must contain only letters.");
+                }
+
+                System.out.print("Enter new age: ");
+                int age = Integer.parseInt(scanner.nextLine());
+                if (age <= 0) {
+                    throw new IllegalArgumentException("Age must be a positive integer.");
+                }
+
+                System.out.print("Enter new major: ");
+                String major = scanner.nextLine();
+
+                String message = studentManager.updateStudent(id, firstName, lastName, age, major);
+                System.out.println(message);
+                break;
+            } catch (NumberFormatException e) {
+                System.out.println("Age must be an integer.");
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
         }
     }
 
     private static void deleteStudent() {
-        System.out.print("Enter student ID: ");
-        int id = Integer.parseInt(scanner.nextLine());
-        if (studentManager.deleteStudent(id)) {
-            System.out.println("Student deleted successfully.");
+        try {
+            System.out.print("Enter student ID: ");
+            int id = Integer.parseInt(scanner.nextLine());
+            if (studentManager.deleteStudent(id)) {
+                System.out.println("Student deleted successfully.");
+            } else {
+                System.out.println("Student not found.");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("ID must be an integer.");
+        }
+    }
+
+    private static void searchStudentsByName() {
+        System.out.print("Enter name to search: ");
+        String name = scanner.nextLine();
+        List<Student> results = studentManager.searchStudentsByName(name);
+        if (results.isEmpty()) {
+            System.out.println("No students found.");
         } else {
-            System.out.println("Student not found.");
+            for (Student student : results) {
+                System.out.println(student);
+            }
         }
     }
 }
