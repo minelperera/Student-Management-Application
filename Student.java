@@ -1,5 +1,6 @@
 public class Student {
     private static int idCounter = 1;
+     // Instance variables for the Student class
     private int id;
     private String firstName;
     private String lastName;
@@ -7,7 +8,8 @@ public class Student {
     private String major;
     private boolean deleted;
 
-    public Student(String firstName, String lastName, int age, String major) {
+     // Constructor to initialize a new student with provided details
+     public Student(String firstName, String lastName, int age, String major) {
         this.id = idCounter++;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -62,6 +64,7 @@ public class Student {
         this.deleted = deleted;
     }
 
+    // Overriding toString method to provide a readable representation of the student
     @Override
     public String toString() {
         return "ID: " + id + "\n" +

@@ -6,8 +6,10 @@ import java.util.List;
 
 public class StudentManagementUI extends JFrame {
     private StudentManager studentManager = new StudentManager();
-    private JTextArea textArea;
+    private JTextArea textArea;// Text area to display student information
 
+
+    // Constructor to initialize the UI
     public StudentManagementUI() {
         setTitle("Student Management System");
         setSize(600, 400);
@@ -16,6 +18,7 @@ public class StudentManagementUI extends JFrame {
         initComponents();
     }
 
+    // Method to initialize UI components
     private void initComponents() {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
@@ -27,6 +30,7 @@ public class StudentManagementUI extends JFrame {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridLayout(7, 1));
 
+        // Create buttons for different operations and add action listeners
         JButton addButton = new JButton("Create a new student");
         addButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -89,9 +93,11 @@ public class StudentManagementUI extends JFrame {
         add(panel);
     }
 
+    // Method to create a new student
     private void createStudent() {
         while (true) {
             try {
+                // Prompt user to enter student details using JOptionPane dialogs
                 String firstName = JOptionPane.showInputDialog("Enter first name:");
                 if (!firstName.matches("[a-zA-Z]+")) {
                     throw new IllegalArgumentException("First name must contain only letters.");
@@ -110,10 +116,11 @@ public class StudentManagementUI extends JFrame {
 
                 String major = JOptionPane.showInputDialog("Enter major:");
 
+                // Create a new Student object and add it to the StudentManager
                 Student student = new Student(firstName, lastName, age, major);
                 String message = studentManager.addStudent(student);
                 textArea.append(message + "\n");
-                break;
+                break;// Exit loop if student creation is successful
             } catch (NumberFormatException e) {
                 JOptionPane.showMessageDialog(this, "Age must be an integer.", "Input Error", JOptionPane.ERROR_MESSAGE);
             } catch (IllegalArgumentException e) {
@@ -122,6 +129,7 @@ public class StudentManagementUI extends JFrame {
         }
     }
 
+    // Method to view all students
     private void viewAllStudents() {
         textArea.setText("");
         for (Student student : studentManager.getAllStudents()) {
@@ -131,6 +139,7 @@ public class StudentManagementUI extends JFrame {
         }
     }
 
+    // Method to view a specific student by ID
     private void viewStudentById() {
         try {
             int id = Integer.parseInt(JOptionPane.showInputDialog("Enter student ID:"));
@@ -148,35 +157,42 @@ public class StudentManagementUI extends JFrame {
             try {
                 int id = Integer.parseInt(JOptionPane.showInputDialog("Enter student ID:"));
                 String firstName = JOptionPane.showInputDialog("Enter new first name:");
+                 // Validate first name (should contain only letters)
                 if (!firstName.matches("[a-zA-Z]+")) {
                     throw new IllegalArgumentException("First name must contain only letters.");
                 }
 
                 String lastName = JOptionPane.showInputDialog("Enter new last name:");
+                // Validate last name (should contain only letters)
                 if (!lastName.matches("[a-zA-Z]+")) {
                     throw new IllegalArgumentException("Last name must contain only letters.");
                 }
 
                 String ageInput = JOptionPane.showInputDialog("Enter new age:");
                 int age = Integer.parseInt(ageInput);
+                 // Validate age (should be a positive integer)
                 if (age <= 0) {
                     throw new IllegalArgumentException("Age must be a positive integer.");
                 }
 
                 String major = JOptionPane.showInputDialog("Enter new major:");
 
+                // Update student details using StudentManager
                 String message = studentManager.updateStudent(id, firstName, lastName, age, major);
                 textArea.append(message + "\n");
-                break;
+                break;// Exit loop if update is successful
             } catch (NumberFormatException e) {
+                // Handle NumberFormatException (occurs if age is not an integer)
                 JOptionPane.showMessageDialog(this, "Age must be an integer.", "Input Error", JOptionPane.ERROR_MESSAGE);
             } catch (IllegalArgumentException e) {
+                // Handle IllegalArgumentException (occurs if input validation fails)
                 JOptionPane.showMessageDialog(this, e.getMessage(), "Input Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
 
-    private void deleteStudent() {
+     // Method to delete a student
+     private void deleteStudent() {
         try {
             int id = Integer.parseInt(JOptionPane.showInputDialog("Enter student ID:"));
             if (studentManager.deleteStudent(id)) {
@@ -189,6 +205,7 @@ public class StudentManagementUI extends JFrame {
         }
     }
 
+    // Method to search students by name
     private void searchStudentsByName() {
         String name = JOptionPane.showInputDialog("Enter name to search:");
         List<Student> results = studentManager.searchStudentsByName(name);
@@ -202,6 +219,7 @@ public class StudentManagementUI extends JFrame {
         }
     }
 
+    // Main method to launch the GUI
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
             StudentManagementUI ui = new StudentManagementUI();
